@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Research Simulation</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 50px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .btn-login { width: 100%; padding: 12px; background: #1a2a6c; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-reg { margin-top: 18px; background: none; border: none; color: #1a2a6c; cursor: pointer; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>TradePlay</h2>
+        <p>Login with your ID</p>
+        <input type="text" id="userid" placeholder="Enter ID">
+        <button class="btn-login" onclick="login()">Login</button>
+        <button class="btn-reg" onclick="window.location.href='register.html'">Don't have an account? Register</button>
+    </div>
+    <script>
+        function login() {
+            const id = document.getElementById('userid').value;
+            if(!id) return alert("Please enter ID");
+            localStorage.setItem('aishu_user', id);
+            window.location.href = 'selection.html';
+        }
+    </script>
+</body>
+</html>

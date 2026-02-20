@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>REGISTER</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 400px; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .btn-submit { background: #1a2a6c; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; cursor: pointer; }
+        .btn-back { margin-top: 10px; background: #666; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2 style="text-align: center;">Register</h2>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="text" id="userid" placeholder="ID">
+        <select id="age"><option>18-24</option><option>25-35</option></select>
+        <select id="exp"><option>Beginner</option><option>Pro</option></select>
+        <button class="btn-submit" onclick="submitReg()">Register & Continue</button>
+        <button class="btn-back" onclick="window.location.href='login.html'">Back to Login</button>
+    </div>
+    <script>
+        async function submitReg() {
+            const data = {
+                user_id: document.getElementById('userid').value,
+                name: document.getElementById('name').value,
+                age: document.getElementById('age').value,
+                experience: document.getElementById('exp').value
+            };
+            const response = await fetch('http://localhost:5000/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const res = await response.json();
+            if(res.status === 'success') {
+                localStorage.setItem('aishu_user', data.user_id);
+                window.location.href = 'selection.html';
+            } else { alert(res.message); }
+        }
+    </script>
+</body>
+</html>

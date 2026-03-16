@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Research Simulation</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #eef2f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .card {
+            background: white;
+            padding: 40px 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 380px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* center contents horizontally */
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(243,156,18,0.15);
+        }
+
+        h2{
+            margin-bottom:5px;
+            color:#1a2a6c;
+            font-size:1.8rem;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:10px;
+        }
+
+        h2 i {
+            color:#f39c12;
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%,100%{ transform: translateY(0); }
+            50%{ transform: translateY(-5px); }
+        }
+
+        p{
+            color:#666;
+            margin-bottom:15px;
+        }
+
+        .badge{
+            background:#eef2ff;
+            color:#1a2a6c;
+            padding:8px 15px;
+            border-radius:30px;
+            font-size:13px;
+            display:block;
+            text-align:center;
+            margin-bottom:25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+
+        .input-box{
+            position:relative;
+            width: 100%; /* make input-box full width of card */
+            margin-bottom:15px;
+        }
+
+        .input-box i{
+            position:absolute;
+            left:12px;
+            top:50%;
+            transform:translateY(-50%);
+            color:#888;
+        }
+
+        input{
+            width:100%;
+            padding:12px 12px 12px 38px;
+            border:1px solid #ccc;
+            border-radius:8px;
+            font-size:15px;
+            transition:0.3s;
+            box-sizing: border-box;
+        }
+
+        input:focus{
+            border-color:#f39c12;
+            outline:none;
+            box-shadow:0 0 8px rgba(243,156,18,0.3);
+        }
+
+        .btn-login{
+            width:100%;
+            padding:14px;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color:white;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+            transition:0.3s;
+            margin-bottom:15px; /* spacing below login button */
+        }
+
+        .btn-login:hover{
+            transform: scale(1.05);
+            box-shadow:0 6px 20px rgba(243,156,18,0.4);
+        }
+
+        .btn-login i{
+            font-size:1.2rem;
+        }
+
+        .btn-reg{
+            background:none;
+            border:none;
+            color:#1a2a6c;
+            cursor:pointer;
+            text-decoration:underline;
+            font-size:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center; /* center horizontally */
+            gap:5px;
+        }
+
+        .btn-reg i{
+            font-size:1rem;
+        }
+
+        .footer{
+            position:absolute;
+            bottom:20px;
+            font-size:12px;
+            color:#666;
+            opacity:0.85;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2><i class="fa-solid fa-chart-line"></i> TradePlay</h2>
+    <p>Login with your ID</p>
+
+    <div class="badge">
+        <i class="fa-solid fa-flask"></i> Research Simulation Platform
+    </div>
+
+    <div class="input-box">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" id="userid" placeholder="Enter ID">
+    </div>
+
+    <button class="btn-login" onclick="login()">
+        <i class="fa-solid fa-right-to-bracket"></i> Login
+    </button>
+
+    <button class="btn-reg" onclick="window.location.href='register.html'">
+        <i class="fa-solid fa-user-plus"></i> Don't have an account? Register
+    </button>
+
+</div>
+
+<div class="footer">
+    Research Prototype • Behavioural Trading Study
+</div>
+
+<script>
+function login() {
+
+    const id = document.getElementById('userid').value;
+
+    if(!id) return alert("Please enter ID");
+
+    document.querySelector(".btn-login").innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+
+    setTimeout(()=>{
+        localStorage.setItem('aishu_user', id);
+        window.location.href = 'selection.html';
+    },1000);
+}
+</script>
+
+</body>
+</html>

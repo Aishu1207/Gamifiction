@@ -1,0 +1,250 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TradePlay | Gamified Thesis Interface</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<style>
+body { margin:0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #eef2f3; }
+#sidebar { width:220px; background:#1a2a6c; color:white; display:flex; flex-direction:column; padding-top:20px; }
+.nav-item { padding:15px 25px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:0.2s; }
+.nav-item:hover { background:#2563eb; }
+.nav-item.active { background:#2563eb; font-weight:700; }
+.main-content { flex:1; padding:20px 30px; overflow-y:auto; }
+header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; }
+.panel { background:white; padding:20px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:20px; }
+table { width:100%; border-collapse:collapse; }
+table th, table td { padding:8px 10px; border-bottom:1px solid #ddd; }
+.mini-badge { margin-right:3px; }
+.reward-grid { display:flex; gap:15px; }
+.reward-card { flex:1; text-align:center; padding:15px; border-radius:10px; border:2px solid #ddd; transition:0.3s; }
+.reward-card.unlocked { border-color:#f39c12; }
+#slider-track { position:relative; height:45px; background:#e2e8f0; border-radius:25px; cursor:pointer; user-select:none; }
+#slider-handle { position:absolute; left:5px; top:5px; width:120px; height:35px; background:#2563eb; border-radius:20px; color:white; text-align:center; line-height:35px; font-weight:bold; transition:background 0.3s; }
+.pulse { animation: pulseGlow 0.8s ease-in-out; }
+@keyframes pulseGlow { 0%{box-shadow:0 0 0 rgba(243,156,18,0.5);transform:scale(1);} 50%{box-shadow:0 0 15px rgba(243,156,18,0.8);transform:scale(1.1);} 100%{box-shadow:0 0 0 rgba(243,156,18,0.5);transform:scale(1);} }
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+    <div style="padding:25px; font-weight:900; font-size:1.4rem;">TradePlay</div>
+    <div class="nav-item active" onclick="switchTab('marketplace', this)"><i class="fas fa-chart-line"></i> Marketplace</div>
+    <div class="nav-item" onclick="switchTab('portfolio', this)"><i class="fas fa-wallet"></i> Portfolio</div>
+    <div class="nav-item" onclick="switchTab('leaderboard', this)"><i class="fas fa-trophy"></i> Leaderboard</div>
+    <div class="nav-item" onclick="switchTab('rewards', this)"><i class="fas fa-medal"></i> Rewards</div>
+</nav>
+
+<div class="main-content">
+    <header>
+        <div style="font-size:0.8rem; color:#64748b;">RESEARCH SESSION: GAMIFIED</div>
+        <div style="background:#eff6ff; padding:8px 15px; border-radius:8px; font-weight:800; color:#2563eb;">
+            XP: <span id="xp-val">0</span>
+        </div>
+    </header>
+
+    <!-- Marketplace -->
+    <main id="marketplace" class="tab-content">
+        <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:25px;">
+            <div class="panel" style="text-align:center;">
+                <span style="font-size:0.8rem; font-weight:800; color:#64748b;">NIFTY 50 INDEX</span>
+                <div style="font-size:4.5rem; font-weight:800; margin:15px 0; color:#1e293b;" id="price">18245.50</div>
+                <div style="height:12px; background:#f1f5f9; border-radius:10px; margin-bottom:10px;">
+                    <div id="progress-bar" style="width:0%; height:100%; background:#2563eb; border-radius:10px; transition:0.5s;"></div>
+                </div>
+                <small style="color:#94a3b8;">Session Progress: <span id="trade-count-display">0</span>/10 Trades</small>
+            </div>
+
+            <div class="panel" style="border:2px solid #2563eb;">
+                <h3 style="margin-top:0">Order Entry</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <span style="font-weight:600;">Lots to Trade</span>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <button onclick="updateQty(-1)" style="width:35px;height:35px;border-radius:50%;border:1px solid #ddd;cursor:pointer;">-</button>
+                        <b id="qty-val" style="font-size:1.3rem;width:25px;text-align:center;">1</b>
+                        <button onclick="updateQty(1)" style="width:35px;height:35px;border-radius:50%;border:1px solid #ddd;cursor:pointer;">+</button>
+                    </div>
+                </div>
+                <div class="slider-track" id="slider-track">
+                    <div id="slider-handle">BUY →</div>
+                    <span style="font-size:0.75rem; color:#94a3b8; user-select:none;">Slide to Confirm</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Portfolio -->
+    <main id="portfolio" class="tab-content" style="display:none;">
+        <div class="panel">
+            <h3>Trade History</h3>
+            <table>
+                <thead><tr><th>Asset</th><th>Lots</th><th>Fill Price</th><th>Time</th></tr></thead>
+                <tbody id="port-body"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Leaderboard -->
+    <main id="leaderboard" class="tab-content" style="display:none;">
+        <div class="panel">
+            <h3>Global Ranking</h3>
+            <table>
+                <thead><tr><th>Rank</th><th>Trader</th><th>Awards Won</th><th style="text-align:right">Total XP</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>Whiz_Trader</td><td><span class="mini-badge">🌱</span><span class="mini-badge">⚡</span><span class="mini-badge">👑</span></td><td style="text-align:right">8,500</td></tr>
+                    <tr style="background:#eff6ff; font-weight:bold; color:#2563eb;">
+                        <td>2</td><td>You (Participant)</td><td id="lead-badges-cell"></td><td style="text-align:right" id="lead-xp">0</td>
+                    </tr>
+                    <tr><td>3</td><td>Novice_Bot</td><td><span class="mini-badge">🌱</span></td><td style="text-align:right">450</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Rewards -->
+    <main id="rewards" class="tab-content" style="display:none;">
+        <div class="panel">
+            <h3>Achievement Gallery</h3>
+            <div class="reward-grid">
+                <div class="reward-card" id="badge-1"><div style="font-size:2.5rem;">🌱</div><b>Rookie</b><br><small>First Trade</small></div>
+                <div class="reward-card" id="badge-5"><div style="font-size:2.5rem;">⚡</div><b>Active Trader</b><br><small>5 Trades Made</small></div>
+                <div class="reward-card" id="badge-whale"><div style="font-size:2.5rem;">🐋</div><b>The Whale</b><br><small>Trade 10 Lots</small></div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<script>
+// GAME STATE
+let tradesCount = 0, totalXP = 0, currentQty = 1, researchLogs = [];
+let sessionStart = Date.now(), lastActionTime = sessionStart;
+const participantID = localStorage.getItem('aishu_user') || ("G_" + Math.floor(Math.random()*9000+1000));
+
+function updateQty(val){
+    currentQty = Math.max(1, Math.min(10, currentQty+val));
+    document.getElementById('qty-val').innerText=currentQty;
+}
+
+function animateXP(oldXP,newXP){
+    let start=oldXP, increment=(newXP-oldXP)/20;
+    const interval=setInterval(()=>{
+        start+=increment;
+        if(start>=newXP){start=newXP; clearInterval(interval);}
+        document.getElementById('xp-val').innerText=Math.floor(start);
+        document.getElementById('lead-xp').innerText=Math.floor(start);
+    },20);
+}
+
+function pulseBadge(badgeId){
+    const badge=document.getElementById(badgeId);
+    badge.classList.add('pulse');
+    setTimeout(()=>badge.classList.remove('pulse'),800);
+}
+
+function switchTab(id,el){
+    document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.getElementById(id).style.display='block';
+    el.classList.add('active');
+}
+
+function executeTrade(){
+    if(tradesCount>=10)return;
+    tradesCount++;
+    const gain=currentQty*100, oldXP=totalXP;
+    totalXP+=gain;
+    const currentPrice=document.getElementById('price').innerText;
+    animateXP(oldXP,totalXP);
+    document.getElementById('trade-count-display').innerText=tradesCount;
+    document.getElementById('progress-bar').style.width=(tradesCount*10)+"%";
+
+    const row=document.getElementById('port-body').insertRow(0);
+    row.innerHTML=`<td>NIFTY 50</td><td>${currentQty}</td><td>${currentPrice}</td><td>${new Date().toLocaleTimeString()}</td>`;
+
+    updateAwards();
+
+    let decisionTime=((Date.now()-lastActionTime)/1000).toFixed(2);
+    let riskFlag=(decisionTime<3 || currentQty===10)?"HIGH":"NORMAL";
+
+    researchLogs.push({
+        Trade_No: tradesCount,
+        Qty: currentQty,
+        Price: currentPrice,
+        Decision_Time_Secs: decisionTime,
+        Risk_Level: riskFlag,
+        Time_Elapsed_Secs:((Date.now()-sessionStart)/1000).toFixed(2)
+    });
+
+    lastActionTime=Date.now();
+
+    // --- SEND TO BACKEND ---
+    fetch('http://localhost:5000/log_trade',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+    user_id: participantID,
+    group_type: 'Gamified',
+    trade_no: tradesCount,
+    qty: currentQty,
+    price: currentPrice,
+    decision_time_secs: decisionTime,
+    risk_level: riskFlag,
+    time_elapsed_secs: ((Date.now()-sessionStart)/1000).toFixed(2)
+})
+});
+    // Confetti
+    confetti({particleCount:150, spread:70, origin:{y:0.8}});
+
+    // Slider animation
+    handle.style.background='#10b981';
+    setTimeout(()=>{handle.style.background='#2563eb'; handle.style.left='5px';},500);
+
+    if(tradesCount===10)setTimeout(downloadResearchData,1500);
+}
+
+function updateAwards(){
+    const leadBadgeCell=document.getElementById('lead-badges-cell');
+    leadBadgeCell.innerHTML="";
+    if(tradesCount>=1){document.getElementById('badge-1').classList.add('unlocked'); leadBadgeCell.innerHTML+='<span class="mini-badge">🌱</span>'; pulseBadge('badge-1');}
+    if(tradesCount>=5){document.getElementById('badge-5').classList.add('unlocked'); leadBadgeCell.innerHTML+='<span class="mini-badge">⚡</span>'; pulseBadge('badge-5');}
+    if(currentQty===10){document.getElementById('badge-whale').classList.add('unlocked'); leadBadgeCell.innerHTML+='<span class="mini-badge">🐋</span>'; pulseBadge('badge-whale');}
+}
+
+function downloadResearchData(){
+    let csv="Trade_No,Quantity,Price,Decision_Time_Secs,Risk_Level,Time_Elapsed_Secs\n";
+    researchLogs.forEach(r=>{csv+=`${r.Trade_No},${r.Qty},${r.Price},${r.Decision_Time_Secs},${r.Risk_Level},${r.Time_Elapsed_Secs}\n`;});
+    const blob=new Blob([csv],{type:'text/csv'});
+    const url=window.URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`Gamified_Data_${participantID}.csv`;
+    a.click();
+    alert("Research Session Complete. Your data has been exported.");
+}
+
+// Slider logic
+const handle=document.getElementById('slider-handle');
+const track=document.getElementById('slider-track');
+let isDragging=false;
+
+handle.onmousedown=()=>isDragging=true;
+window.onmousemove=(e)=>{
+    if(!isDragging)return;
+    let rect=track.getBoundingClientRect();
+    let x=e.clientX-rect.left-60;
+    if(x>=5 && x<=(track.offsetWidth-125)) handle.style.left=x+'px';
+};
+window.onmouseup=()=>{
+    if(!isDragging) return;
+    isDragging=false;
+    if(parseInt(handle.style.left)>(track.offsetWidth-140)) executeTrade();
+    else handle.style.left='5px';
+};
+
+// Price engine
+setInterval(()=>{document.getElementById('price').innerText=(18240+Math.random()*20).toFixed(2);},3000);
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Environment</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            margin: 0;
+        }
+
+        .box { 
+            background: white; 
+            padding: 50px 60px; 
+            border-radius: 20px; 
+            text-align: center; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); 
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            font-size: 2rem; 
+            color: #333; 
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: #f39c12;
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        p {
+            font-size: 1.1rem; 
+            margin-bottom: 30px; 
+            color: #555;
+        }
+
+        .btn { 
+            padding: 15px 35px; 
+            margin: 10px; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            color: white; 
+            transition: 0.3s; 
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-normal { 
+            background: linear-gradient(45deg, #4a4a4a, #222); 
+        }
+
+        .btn-gamified { 
+            background: linear-gradient(45deg, #f39c12, #e67e22); 
+        }
+
+        .btn:hover { 
+            opacity: 0.9; 
+            transform: scale(1.08); 
+        }
+
+        .btn i {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2><i class="fas fa-chart-line"></i> Choose Your Trading Environment</h2>
+        <p>Participant: <span id="disp-id"></span></p>
+        <button class="btn btn-normal" onclick="window.location.href='control.html'">
+            <i class="fas fa-desktop"></i> Normal Interface
+        </button>
+        <button class="btn btn-gamified" onclick="window.location.href='gamified.html'">
+            <i class="fas fa-gamepad"></i> Gamified Interface
+        </button>
+    </div>
+
+    <script>
+        document.getElementById('disp-id').innerText = localStorage.getItem('aishu_user');
+    </script>
+</body>
+</html>
